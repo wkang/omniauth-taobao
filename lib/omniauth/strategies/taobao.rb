@@ -11,10 +11,6 @@ module OmniAuth
         options[:state] ||= '1'
         super
       end
-      
-      # def callback_url
-      #   "http://www.zuiyouji.com:3000" + script_name + callback_path
-      # end 
 
       uid { raw_info['uid'] }
 
