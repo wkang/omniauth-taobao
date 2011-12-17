@@ -12,12 +12,13 @@ module OmniAuth
         super
       end
 
-
       uid { raw_info['uid'] }
 
       info do
         {
           'uid' => raw_info['uid'],
+          'nickname' => raw_info['nick'],
+          'email' => raw_info['email'],
           'user_info' => raw_info,
           'extra' => {
             'user_hash' => raw_info,
@@ -29,7 +30,7 @@ module OmniAuth
         url = 'http://gw.api.taobao.com/router/rest'
 
         query_param = {
-          :app_key => client_id,
+          :app_key => options.client_id,
 
           # TODO to be moved in options
           # TODO add more default fields (http://my.open.taobao.com/apidoc/index.htm#categoryId:1-dataStructId:3)
@@ -50,7 +51,7 @@ module OmniAuth
       
       def generate_sign(params)
         # params.sort.collect { |k, v| "#{k}#{v}" }
-        str = client_secret + params.sort {|a,b| "#{a[0]}"<=>"#{b[0]}"}.flatten.join + client_secret
+        str = options.client_secret + params.sort {|a,b| "#{a[0]}"<=>"#{b[0]}"}.flatten.join + options.client_secret
         params['sign'] = Digest::MD5.hexdigest(str).upcase!
         params
       end
