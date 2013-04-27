@@ -3,6 +3,9 @@ require 'omniauth-oauth2'
 module OmniAuth
   module Strategies
     class Taobao < OmniAuth::Strategies::OAuth2
+
+      class TaobaoAuthorizationError < StandardError; end
+
       option :client_options, {
         :authorize_url => 'https://oauth.taobao.com/authorize',
         :token_url => 'https://oauth.taobao.com/token',
@@ -44,7 +47,9 @@ module OmniAuth
         }
         query_param = generate_sign(query_param)
         res = Net::HTTP.post_form(URI.parse(url), query_param)
-        @raw_info ||= MultiJson.decode(res.body)['user_get_response']['user']
+        body = MultiJson.decode(res.body)
+        raise TaobaoAuthorizationError, body["error_response"] if body["error_response"]
+        @raw_info ||= body['user_get_response']['user']
       rescue ::Errno::ETIMEDOUT
         raise ::Timeout::Error
       end
