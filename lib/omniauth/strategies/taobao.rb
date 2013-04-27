@@ -7,9 +7,12 @@ module OmniAuth
       class TaobaoAuthorizationError < StandardError; end
 
       option :client_options, {
-        :authorize_url => 'https://oauth.taobao.com/authorize',
-        :token_url => 'https://oauth.taobao.com/token',
+        :site => "https://oauth.taobao.com",
+        :authorize_url => '/authorize',
+        :token_url => '/token',
+        :top_url =>"http://gw.api.taobao.com/router/rest"
       }
+
       def request_phase
         options[:state] ||= '1'
         super
@@ -30,8 +33,6 @@ module OmniAuth
       end
 
       def raw_info
-        url = 'http://gw.api.taobao.com/router/rest'
-
         query_param = {
           :app_key => options.client_id,
 
@@ -45,8 +46,9 @@ module OmniAuth
           :timestamp   => Time.now.strftime('%Y-%m-%d %H:%M:%S'),
           :v => '2.0'
         }
+
         query_param = generate_sign(query_param)
-        res = Net::HTTP.post_form(URI.parse(url), query_param)
+        res = Net::HTTP.post_form(URI.parse(options.client_options.top_url), query_param)
         body = MultiJson.decode(res.body)
         raise TaobaoAuthorizationError, body["error_response"] if body["error_response"]
         @raw_info ||= body['user_get_response']['user']
