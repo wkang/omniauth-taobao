@@ -12,6 +12,8 @@ module OmniAuth
         :token_url => '/token',
         :top_url =>"http://gw.api.taobao.com/router/rest"
       }
+      
+      option :fields, 'user_id,uid,nick,sex,buyer_credit,seller_credit,location,created,last_visit,birthday,type,status,alipay_bind,avatar,email,consumer_protection'
 
       def request_phase
         options[:state] ||= '1'
@@ -38,7 +40,7 @@ module OmniAuth
 
           # TODO to be moved in options
           # TODO add more default fields (http://my.open.taobao.com/apidoc/index.htm#categoryId:1-dataStructId:3)
-          :fields => 'user_id,uid,nick,sex,buyer_credit,seller_credit,location,created,last_visit,birthday,type,status,alipay_no,alipay_account,alipay_account,email,consumer_protection,alipay_bind',
+          :fields => options.fields,
           :format => 'json',
           :method => 'taobao.user.get',
           :session => @access_token.token,
